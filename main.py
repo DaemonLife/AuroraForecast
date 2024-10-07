@@ -6,22 +6,56 @@ from time import sleep
 import argparse
 import os
 import platform
+import random
 
 def console_clear():
     os.system("cls" if platform.system() == "Windows" else "clear")
 
-def print_title():
+def print_title(max_HPI):
     title_parts = [\
 '''                                       ______                           _     ''',
 '''      /\                              |  ____|                         | |    ''',
 '''     /  \  _   _ _ __ ___  _ __ __ _  | |__ ___  _ __ ___  ___ __ _ ___| |_   ''',
 '''    / /\ \| | | | '__/ _ \| '__/ _` | |  __/ _ \| '__/ _ \/ __/ _` / __| __|  ''',
 '''   / ____ \ |_| | | | (_) | | | (_| | | | | (_) | | |  __/ (_| (_| \__ \ |_ _ ''',
-'''  /_/    \_\__,_|_|  \___/|_|  \__,_| |_|  \___/|_|  \___|\___\__,_|___/\__(_)''',
+'''  /_/    \_\__,_|_|  \___/|_|  \__,_| |_|  \___/|_|  \___|\___\__,_|___/\__(_)\n''',
     ]
-    for part in title_parts:
-        color = "red" if title_parts.index(part) < 3 else "green"
-        print(plt.colorize(part, color, "bold"))
+
+    def colorize(gray=0, red=0):
+        colors = []
+        for i in range(len(title_parts)):
+            if i < gray:
+                colors.append('gray')
+            elif i < gray+red:
+                colors.append('red')
+            else:
+                colors.append('green')
+            i+=1
+        return colors
+    
+    str_len = len(title_parts)
+    if max_HPI > 300:
+        colors = colorize(0,str_len)
+    elif max_HPI > 250:
+        colors = colorize(0,str_len-1)
+    elif max_HPI > 200:
+        colors = colorize(1,str_len-2)
+    elif max_HPI > 150:
+        colors = colorize(1,str_len-3)
+    elif max_HPI > 90:
+        colors = colorize(2,str_len-3)
+    elif max_HPI > 70:
+        colors = colorize(3,str_len-4)
+    elif max_HPI > 50:
+        colors = colorize(4)
+    elif max_HPI > 30:
+        colors = colorize(5)
+    else:
+        colors = colorize(str_len)
+
+    for i in range(len(colors)):
+        color = colors[i]
+        print(plt.colorize(title_parts[i], color, "bold"))
 
 def fetch_data(url):
     try:
@@ -88,7 +122,8 @@ def main():
 
     # Print title program
     if not args.no_title:
-        print_title()
+        max_HPI = df['North'].max()
+        print_title(max_HPI)
 
     # Show plot
     plt.show()
